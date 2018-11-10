@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hualife.aegis.mapper.SystemMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hualife.aegis.entity.System">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="principal" property="principal"/>
+        <result column="telephone" property="telephone"/>
+        <result column="email" property="email"/>
+        <result column="stego_key" property="stegoKey"/>
+        <result column="authority_type" property="authorityType"/>
+        <result column="type" property="type"/>
+        <result column="status" property="status"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, principal, telephone, email, stego_key, authority_type, type, created_user, created_date,
+        updated_user, updated_date
+    </sql>
+    <insert id="insert">
+        INSERT INTO `aegis`.`system` (`id`,
+                                      `name`,
+                                      `principal`,
+                                      `telephone`,
+                                      `email`,
+                                      `stego_key`,
+                                      `authority_type`,
+                                      `type`,
+                                      `status`)
+        VALUES (#{id}, #{name}, #{principal}, #{telephone}, #{email}, #{stegoKey}, #{authorityType}, #{type}, '1')
+    </insert>
+    <update id="updateById">
+        UPDATE `aegis`.`system`
+        <set>
+            <if test="name != null">`name` = #{name},</if>
+            <if test="principal != null">`principal` = #{principal},</if>
+            <if test="telephone != null">`telephone` = #{telephone},</if>
+            <if test="email != null">`email` = #{email},</if>
+            <if test="stegoKey != null">`stego_key` = #{stegoKey},</if>
+            <if test="authorityType != null">`authority_type` = #{authorityType},</if>
+            <if test="type != null">`type` = #{type},</if>
+            <if test="status != null">`status` = #{status},</if>
+        </set>
+        WHERE (`id`=#{id});
+    </update>
+    <select id="getStegoKeyById" resultType="java.lang.String">
+        SELECT stego_key
+        FROM `system`
+        WHERE id = #{id}
+    </select>
+    <select id="getSystemByUserId" parameterType="java.lang.Integer" resultType="com.hualife.aegis.entity.System">
+        SELECT s.id,
+               s.name,
+               s.principal,
+               s.telephone,
+               s.email,
+               s.stego_key,
+               s.authority_type,
+               s.type
+        FROM SYSTEM s
+                 LEFT JOIN user_system us ON us.system_id = s.id
+        WHERE s.status = 1
+          AND us.user_id = #{userId}
+    </select>
+    <select id="selectById" resultType="com.hualife.aegis.entity.System">
+        select *
+        from `system`
+        where `id` = #{id}
+    </select>
+    <select id="getAuthorizedUsersPage" resultType="com.hualife.aegis.entity.User">
+        SELECT u.* FROM `user` u RIGHT JOIN `user_system` us ON u.id = us.user_id
+        <where>
+            us.system_id = #{userSystemDTO.systemId}
+        </where>
+        ORDER BY us.updated_date DESC , us.created_date DESC
+    </select>
+    <select id="getNotAuthorizedUsersPage" resultType="com.hualife.aegis.entity.User">
+        SELECT * FROM `user` u
+        <where>
+            NOT EXISTS (SELECT * FROM `user_system` us WHERE us.user_id = u.id AND us.system_id =
+            #{userSystemDTO.systemId})
+            <if test="userSystemDTO.loginName != null">
+                <bind name="pattern" value="'%' + userSystemDTO.loginName + '%'"/>
+                AND u.login_name LIKE #{pattern}
+            </if>
+            <if test="userSystemDTO.username != null">
+                <bind name="pattern1" value="'%' + userSystemDTO.username + '%'"/>
+                AND u.name LIKE #{pattern1}
+            </if>
+        </where>
+        ORDER BY u.name DESC
+    </select>
+    <select id="getSystemsPage" resultType="com.hualife.aegis.entity.System">
+        SELECT *
+        FROM `system`
+        <where>
+            `status`=1
+            <if test="systemDTO.id != null">
+                <bind name="pattern" value="'%' + systemDTO.id + '%'"/>
+                AND id LIKE #{pattern}
+            </if>
+            <if test="systemDTO.name != null">
+                <bind name="pattern" value="'%' + systemDTO.name + '%'"/>
+                AND name LIKE #{pattern}
+            </if>
+        </where>
+        ORDER BY updated_date DESC , created_date DESC
+    </select>
+</mapper>

@@ -1,0 +1,57 @@
+server:
+  port: 8888
+  start-timeout: 100000
+logging:
+  config: classpath:config/log4j2.xml
+merlin:
+  datasource:
+    enabled: true
+    type: druid
+    driverClassName: com.mysql.jdbc.Driver
+    username: ageis
+    password: ageis
+    url: jdbc:mysql://10.0.18.70:3306/ageis?useUnicode=true&useSSL=false&characterEncoding=utf8
+    pool:
+      initialSize: 5
+      minIdle: 5
+      maxActive: 20
+      maxWait: 60000
+      timeBetweenEvictionRunsMillis: 60000
+      minEvictableIdleTimeMillis: 300000
+      validationQuery: SELECT 1 FROM DUAL
+      testWhileIdle: true
+      testOnBorrow: false
+      testOnReturn: false
+      poolPreparedStatements: true
+      maxPoolPreparedStatementPerConnectionSize: 20
+      filters: stat,wall,log4j2
+      connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=5000
+  mybatis:
+    enabled: true
+    mapperLocations: classpath*:mapper/*.xml
+    basePackage: com.hualife.aegis.mapper
+    #configuration:
+    #  map-underscore-to-camel-case:true
+    configuration:
+      log-impl: LOG4J2
+  swagger:
+      apidoc:
+        enabled: true
+        title: 宙斯盾项目文档接口
+        description: 宙斯盾项目文档接口
+        contact:
+          name: zhangqinghua;xiaoming
+          url: test.com
+          email: zhangqinghua@hualife.cc;xiaoming@hualife.cc
+        version: 1.0
+        path-match: /*
+spring:
+  redis:
+    port: 8400
+    host: 10.0.18.41
+    database: 0
+    jedis:
+      pool:
+        max-active: 8
+        min-idle: 0
+

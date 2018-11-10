@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hualife.aegis.mapper.ResourcesMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hualife.aegis.entity.Resources">
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="type" property="type"/>
+        <result column="parent_id" property="parentId"/>
+        <result column="level" property="level"/>
+        <result column="status" property="status"/>
+        <result column="sequence" property="sequence"/>
+        <result column="url" property="url"/>
+        <result column="system_id" property="systemId"/>
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, name, type, parent_id, level, status, sequence, url, system_id, created_user, created_date,
+        updated_user, updated_date
+    </sql>
+    <select id="getResourcesByRoleId" parameterType="java.lang.Integer" resultType="com.hualife.aegis.entity.Resources">
+        select
+        r.id ,r.name,r.type, r.parent_id, r.level, r.status, r.sequence, r.url, r.system_id
+        from resources r left join
+        role_resources rr on rr.resources_id = r.id where r.status = 1 and rr.role_id=#{roleId}
+    </select>
+</mapper>
